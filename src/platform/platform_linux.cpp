@@ -36,6 +36,8 @@
 #include <daemon/default_vm_image_vault.h>
 #include <disabled_update_prompt.h>
 
+#include <QKeySequence>
+
 #include <signal.h>
 #include <sys/prctl.h>
 
@@ -51,13 +53,23 @@ constexpr auto autostart_filename = "multipass.gui.autostart.desktop";
 
 std::map<QString, QString> mp::platform::extra_settings_defaults()
 {
-    return {{hotkey_key, "ctrl+alt+u"}};
+    return {{hotkey_key, "ctrl+alt+u"}}; // TODO@ricardo test this is properly interpreted
 }
 
 QString mp::platform::interpret_setting(const QString& key, const QString& val)
 {
     if (key == hotkey_key)
-        return val;
+    {
+        if (QKeySequence sequence{val}; sequence.isEmpty())
+            throw InvalidSettingsException(key, val, "Invalid key sequence"); // TODO@ricardo test
+        else if (sequence.count() > 1)
+            throw InvalidSettingsException(key, val, "Multiple key sequences are not supported"); // TODO@ricardo test
+        else if (auto ret = sequence.toString();
+                 ret.isEmpty()) // get and check normalized representation // TODO@ricardo test
+            throw InvalidSettingsException(key, val, "Invalid key sequence"); // TODO@ricardo test
+        else
+            return ret; // TODO@ricardo protect against unmodified letters
+    }
 
     // this should not happen (settings should have found it to be an invalid key)
     throw InvalidSettingsException(key, val, "Setting unavailable on Linux");
