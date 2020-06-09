@@ -1,4 +1,4 @@
-# Copyright © 2018-2020 Canonical Ltd.
+# Copyright © 2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as
@@ -12,19 +12,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-include(FindPkgConfig)
-pkg_search_module(APPARMOR libapparmor REQUIRED)
+add_library(process STATIC
+  basic_process.cpp
+  process_spec.cpp
+  qemuimg_process_spec.cpp
+  simple_process_spec.cpp
+  ${CMAKE_SOURCE_DIR}/include/multipass/process/basic_process.h
+  ${CMAKE_SOURCE_DIR}/include/multipass/process/process.h)
 
-add_library(shared_linux STATIC
-  apparmor.cpp
-  backend_utils.cpp
-  process_factory.cpp)
-
-include_directories(shared_linux
-  ..)
-
-target_link_libraries(shared_linux
-  apparmor
-  fmt
-  utils
+target_link_libraries(process
+  logger
   Qt5::Core)
