@@ -125,3 +125,13 @@ void mp::LXDVirtualMachineFactory::hypervisor_health_check()
         throw std::runtime_error("Failed to authenticate to LXD.");
     }
 }
+
+mp::NetworkAccessManager* mp::LXDVirtualMachineFactory::get_network_manager() const
+{
+    return manager.get();
+}
+
+QUrl mp::LXDVirtualMachineFactory::get_base_url() const
+{
+    return base_url;
+}

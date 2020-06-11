@@ -126,16 +126,18 @@ mp::VirtualMachineFactory::UPtr mp::platform::vm_backend(const mp::Path& data_di
         throw std::runtime_error(fmt::format("Unsupported virtualization driver: {}", driver));
 }
 
-std::unique_ptr<mp::VMImageVault> mp::platform::make_image_vault(std::vector<mp::VMImageHost*> image_hosts,
-                                                                 mp::URLDownloader* downloader, mp::Path cache_dir_path,
-                                                                 mp::Path data_dir_path, mp::days days_to_expire)
+std::unique_ptr<mp::VMImageVault> mp::platform::make_image_vault(const VirtualMachineFactory* factory,
+                                                                 const QString& driver,
+                                                                 const std::vector<VMImageHost*> image_hosts)
 {
-    const auto& driver = utils::get_driver_str();
     if (driver == QStringLiteral("lxd"))
-        return std::make_unique<LXDVMImageVault>(image_hosts);
-    else
-        return std::make_unique<DefaultVMImageVault>(image_hosts, downloader, cache_dir_path, data_dir_path,
-                                                     days_to_expire);
+    {
+        const auto lxd_factory = dynamic_cast<const LXDVirtualMachineFactory*>(factory);
+        return std::make_unique<LXDVMImageVault>(image_hosts, lxd_factory->get_network_manager(),
+                                                 lxd_factory->get_base_url());
+    }
+
+    return nullptr;
 }
 
 std::unique_ptr<mp::Process> mp::platform::make_sshfs_server_process(const mp::SSHFSServerConfig& config)

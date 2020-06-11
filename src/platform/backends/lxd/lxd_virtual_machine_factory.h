@@ -50,6 +50,8 @@ public:
     {
         return "lxd";
     };
+    NetworkAccessManager* get_network_manager() const;
+    QUrl get_base_url() const;
 
 private:
     NetworkAccessManager::UPtr manager;
