@@ -132,7 +132,7 @@ std::unique_ptr<mp::VMImageVault> mp::platform::make_image_vault(std::vector<mp:
 {
     const auto& driver = utils::get_driver_str();
     if (driver == QStringLiteral("lxd"))
-        return std::make_unique<LXDVMImageVault>(image_hosts);
+        return std::make_unique<LXDVMImageVault>(image_hosts, days_to_expire);
     else
         return std::make_unique<DefaultVMImageVault>(image_hosts, downloader, cache_dir_path, data_dir_path,
                                                      days_to_expire);
